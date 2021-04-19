@@ -2,7 +2,7 @@
 
     // You'll need to replace this with the URL you get when you
     // deploy your API Gateway.
-    const baseUrl = 'https://nh5gsos957.execute-api.us-east-1.amazonaws.com/prod/'
+    const baseUrl = 'https://1hykustfe8.execute-api.us-east-1.amazonaws.com/beta';
     console.log(`The base URL is ${baseUrl}.`);
 
     // Set up the functions to be called when the user clicks on any
@@ -15,11 +15,7 @@
         $('#get-route-by-id').click(getRouteById);
     });
 
-    // This generates a single random route by POSTing the
-    // runId and generation to the `/routes` endpoint.
-    // It's asynchronous (like requests across the network
-    // typically are), and the showRoute() function is called
-    // when the request response comes in.
+   
     function randomRoute(runId, generation) {
         $.ajax({
             method: 'POST',
@@ -44,21 +40,6 @@
         })
     }
 
-    // Generates a collection of new routes, where the number to generate
-    // (and the runId and generation) are specified in the HTML text
-    // fields. Note that we don't do any kind of sanity checking here, when
-    // it would make sense to at least ensure that `numToGenerate` is a
-    // non-negative number.
-    //
-    // This uses the `async` library (https://caolan.github.io/async/v3/docs.html)
-    // to place the requests asynchronously, so we can benefit from parallel
-    // computation on the AWS end. You can get burned, though, if you set
-    // numToGenerate too high as there are a host of AWS capacity limits that
-    // you might exceed, leading to a failed HTTP requests. I've had no trouble
-    // with up to 500 at a time, but 1,000 regularly breaks things.
-    //
-    // We never do anything with the `event` argument because we know what
-    // button was clicked and don't care about anything else.
     function randomRoutes(event) {
         const runId = $('#runId-text-field').val();
         const generation = $('#generation-text-field').val();
@@ -77,17 +58,6 @@
         const routeId = result.routeId;
         const length = result.length;
         $('#new-route-list').append(`<li>We generated route ${routeId} with length ${length}.</li>`);
-    }
-
-    function getBestRoutes(event) {
-        const runId = $('#runId-text-field').val();
-        const generation = $('#generation-text-field').val();
-        const numToReturn =$('#num-best-to-get').val();
-        // Reset the contents of `#new-route-list` so that it's ready for
-        // `showRoute()` to "fill" it with the incoming new routes. 
-        $('#best-route-list').text('');
-        // 
-        bestRoutes(runId, generation, numToReturn);
     }
 
     // Make a `GET` request that gets the K best routes.
@@ -118,6 +88,17 @@
                 alert('An error occurred when getting the best routes:\n' + jqXHR.responseText);
             }
         })
+    }
+
+    function getBestRoutes(event) {
+        const runId = $('#runId-text-field').val();
+        const generation = $('#generation-text-field').val();
+        const numToReturn =$('#num-best-to-get').val();
+        // Reset the contents of `#new-route-list` so that it's ready for
+        // `showRoute()` to "fill" it with the incoming new routes. 
+        $('#best-route-list').text('');
+        // 
+        bestRoutes(runId, generation, numToReturn);
     }
 
     function showBestRoute(result) {
