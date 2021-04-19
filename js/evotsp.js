@@ -79,6 +79,17 @@
         $('#new-route-list').append(`<li>We generated route ${routeId} with length ${length}.</li>`);
     }
 
+    function getBestRoutes(event) {
+        const runId = $('#runId-text-field').val();
+        const generation = $('#generation-text-field').val();
+        const numToReturn =$('#num-best-to-get').val();
+        // Reset the contents of `#new-route-list` so that it's ready for
+        // `showRoute()` to "fill" it with the incoming new routes. 
+        $('#best-route-list').text('');
+        // 
+        bestRoutes(runId, generation, numToReturn);
+    }
+
     // Make a `GET` request that gets the K best routes.
     // The form of the `GET` request is:
     //   …/best?runId=…&generation=…&numToReturn=…
@@ -86,8 +97,33 @@
     //    { length: …, routeId: …}
     // You should add each of these to `#best-route-list`
     // (after clearing it first).
-    function getBestRoutes(event) {
-        alert('You need to implement getBestRoutes()');
+    function bestRoutes(runId, generation, numToReturn) {
+        $.ajax({
+            method: 'GET',
+            url: baseUrl + '/best',
+            data: JSON.stringify({
+                runId: runId,
+                generation: generation,
+                numToReturn: numToReturn
+            }),
+            contentType: 'application/json',
+            success: showBestRoute,
+            error: function ajaxError(jqXHR, textStatus, errorThrown) {
+                console.error(
+                    'Error generating best routes: ', 
+                    textStatus, 
+                    ', Details: ', 
+                    errorThrown);
+                console.error('Response: ', jqXHR.responseText);
+                alert('An error occurred when getting the best routes:\n' + jqXHR.responseText);
+            }
+        })
+    }
+
+    function showBestRoute(result) {
+        const routeId = result.routeId;
+        const length = result.length;
+        $('#best-route-list').append(`<li> ${length} , ${routeId}</li>`);
     }
 
     // Make a `GET` request that gets all the route information
