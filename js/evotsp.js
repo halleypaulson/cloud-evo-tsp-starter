@@ -51,8 +51,6 @@
         async.times(numToGenerate, () => randomRoute(runId, generation));
     }
 
-    // When a request for a new route is completed, add an `<li>…</li>` element
-    // to `#new-route-list` with that routes information.
     function showRoute(result) {
         console.log('New route received from API: ', result);
         const routeId = result.routeId;
@@ -71,11 +69,11 @@
         $.ajax({
             method: 'GET',
             url: baseUrl + '/best',
-            data: JSON.stringify({
+            data: {
                 runId: runId,
                 generation: generation,
                 numToReturn: numToReturn
-            }),
+            },
             contentType: 'application/json',
             success: showBestRoute,
             error: function ajaxError(jqXHR, textStatus, errorThrown) {
@@ -114,8 +112,35 @@
     // This request will return a complete route JSON object.
     // You should display the returned information in 
     // `#route-by-id-elements` (after clearing it first).
+    function routeById(routeId) {
+        $.ajax({
+            method: 'GET',
+            url: baseUrl + '/routes' + '/' + routeId,
+            contentType: 'application/json',
+            success: showRouteJSON,
+            error: function ajaxError(jqXHR, textStatus, errorThrown) {
+                console.error(
+                    'Error getting route: ', 
+                    textStatus, 
+                    ', Details: ', 
+                    errorThrown);
+                console.error('Response: ', jqXHR.responseText);
+                alert('An error occurred when getting the route:\n' + jqXHR.responseText);
+            }
+        })
+    }
+
     function getRouteById() {
-        alert('You need to implement getRouteById()');
+        const routeId = $('#route-ID').val();
+        $('route-by-id').text('');
+
+        routeById(routeId);
+    }
+
+    function showRouteJSON(result) {
+        const body = JSON.stringify(result);
+        body = JSON.parse(body);
+        $('route-by-id-elements').append(`<li> ${body} </li>`)
     }
 
 }(jQuery));
