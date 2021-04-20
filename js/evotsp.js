@@ -68,12 +68,7 @@
     function bestRoutes(runId, generation, numToReturn) {
         $.ajax({
             method: 'GET',
-            url: baseUrl + '/best',
-            data: {
-                runId: runId,
-                generation: generation,
-                numToReturn: numToReturn
-            },
+            url: baseUrl + `/best?runId=${runId}&generation=${generation}&numToReturn=${numToReturn}`,
             contentType: 'application/json',
             success: showBestRoute,
             error: function ajaxError(jqXHR, textStatus, errorThrown) {
@@ -100,9 +95,12 @@
     }
 
     function showBestRoute(result) {
-        const routeId = result.routeId;
-        const length = result.length;
+        console.log(result);
+        for(let index = 0; index < result.length; index++){
+            const routeId = result[index].routeId;
+            const length = result[index].length;
         $('#best-route-list').append(`<li> ${length} , ${routeId}</li>`);
+        }
     }
 
     // Make a `GET` request that gets all the route information
@@ -138,9 +136,13 @@
     }
 
     function showRouteJSON(result) {
-        const body = JSON.stringify(result);
-        body = JSON.parse(body);
-        $('route-by-id-elements').append(`<li> ${body} </li>`)
+        console.log(result);
+
+        $('#route-by-id-elements').append(
+            `<li>Partition Key: ${result.partitionKey}</li><br>
+            <li>Route ID: ${result.routeId}</li><br>
+            <li>Length: ${result.length}</li><br>
+            <li>Route: ${result.route}</li>`);
     }
 
 }(jQuery));
